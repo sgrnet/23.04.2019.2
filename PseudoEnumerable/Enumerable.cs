@@ -61,7 +61,20 @@ namespace PseudoEnumerable
         public static IEnumerable<TResult> Transform<TSource, TResult>(this IEnumerable<TSource> source,
             Func<TSource, TResult> transformer)
         {
-            throw new NotImplementedException();
+            if (source is null)
+            {
+                throw new ArgumentNullException("source is null");
+            }
+
+            if (transformer is null)
+            {
+                throw new ArgumentNullException("source is null");
+            }
+
+            foreach (var item in source)
+            {
+                yield return transformer(item);
+            }
         }
 
         /// <summary>
