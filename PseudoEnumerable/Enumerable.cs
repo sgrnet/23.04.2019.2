@@ -6,6 +6,7 @@ namespace PseudoEnumerable
 {
     public static class Enumerable
     {
+        
         /// <summary>
         /// Filters a sequence of values based on a predicate.
         /// </summary>
@@ -78,7 +79,35 @@ namespace PseudoEnumerable
         public static IEnumerable<TSource> SortBy<TSource, TKey>(this IEnumerable<TSource> source,
             Func<TSource, TKey> key)
         {
-            throw new NotImplementedException();
+            
+            if (source is null)
+            {
+                throw new ArgumentNullException("source is null");
+            }
+            if (key is null)
+            {
+                throw new ArgumentNullException("key is null");
+            }
+            List<TSource> lsrc = new List<TSource>(); 
+            List<TKey> lkey = new List<TKey>();
+            foreach (var item in source)
+            {
+               lsrc.Add(item);
+               lkey.Add(key(item));
+            }
+            TSource[] asource = lsrc.ToArray();
+            TKey[] akey = lkey.ToArray();
+            Array.Sort<TKey,TSource>(akey, asource);
+            IEnumerable<TSource> CustEnum(IEnumerable<TSource> result)
+            {
+                foreach (var item in result)
+                {
+                    yield return item;
+                }
+            }
+
+            return CustEnum(asource);
+           
         }
 
         /// <summary>
@@ -98,7 +127,34 @@ namespace PseudoEnumerable
         public static IEnumerable<TSource> SortBy<TSource, TKey>(this IEnumerable<TSource> source,
             Func<TSource, TKey> key, IComparer<TKey> comparer)
         {
-            throw new NotImplementedException();
+
+            if (source is null)
+            {
+                throw new ArgumentNullException("source is null");
+            }
+            if (key is null)
+            {
+                throw new ArgumentNullException("key is null");
+            }
+            List<TSource> lsrc = new List<TSource>();
+            List<TKey> lkey = new List<TKey>();
+            foreach (var item in source)
+            {
+                lsrc.Add(item);
+                lkey.Add(key(item));
+            }
+            TSource[] asource = lsrc.ToArray();
+            TKey[] akey = lkey.ToArray();
+            Array.Sort<TKey, TSource>(akey, asource, comparer);
+            IEnumerable<TSource> CustEnum(IEnumerable<TSource> result)
+            {
+                foreach (var item in result)
+                {
+                    yield return item;
+                }
+            }
+
+            return CustEnum(asource);
         }
 
         /// <summary>
@@ -113,15 +169,27 @@ namespace PseudoEnumerable
         /// <exception cref="InvalidCastException">An element in the sequence cannot be cast to type TResult.</exception>
         public static IEnumerable<TResult> CastTo<TResult>(IEnumerable source)
         {
-            foreach (var item in source)
+            if (source is null)
             {
-
-                yield return (TResult)item;
-               
+                throw new ArgumentNullException($"source is null.");
             }
 
+            if (source is IEnumerable<TResult> resultSource)
+            {
+                return resultSource;
+            }
 
-            throw new NotImplementedException();
+            return CustEnumerable();
+            IEnumerable<TResult> CustEnumerable()
+            {
+                foreach (var item in source)
+                {
+                    if (item is TResult)
+                    {
+                        yield return (TResult)item;
+                    }
+                }
+            }
         }
 
         /// <summary>
